@@ -108,6 +108,32 @@ Promiser.CanvasView = SC.View.extend({
         this.mouseDragged(evt); 
         this.mouseInfo = null; // cleanup info
         return YES; // handled!
+    },
+
+    touchStart: function (touch) {
+        this.touchInfo = {
+            x: touch.clientX,
+            y: touch.clientY,
+            cx: this.camera.get('x'),
+            cy: this.camera.get('y')
+        };
+    },
+
+    touchesDragged: function (touch) {
+        var info = this.touchInfo;
+        var zoom = this.camera.get('zoom');
+        var dx = touch.clientX - info.x;
+        var dy = touch.clientY - info.y;
+        var x = info.cx - dx / zoom;
+        var y = info.cy - dy / zoom;
+        this.camera.set('x', x);
+        this.camera.set('y', y);
+    },
+
+    touchEnd: function (touch) {
+        console.log('Touch End');
+        this.touchesDragged(touch); 
+        this.touchInfo = null;
     }
 
 });
