@@ -47,7 +47,7 @@ Promiser.CanvasView = SC.View.extend({
             var vx = this.engine.floatBuffer[i*s+2];
             var vy = this.engine.floatBuffer[i*s+3];
             var target = this.engine.intBuffer[i*s+4];
-            var static = this.engine.intBuffer[i*s+5];
+            var isStatic = this.engine.intBuffer[i*s+5];
             var dSq = vx*vx+vy*vy;
 
             // camera transformation

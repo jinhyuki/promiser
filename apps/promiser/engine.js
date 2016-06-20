@@ -11,7 +11,7 @@ Promiser.Engine = SC.Object.extend({
         this.width = 1000;
         this.height = 1000;
         this.count = 10000;
-        this.props = ['x', 'y', 'vx', 'vy', 'target', 'static', 'energy'];
+        this.props = ['x', 'y', 'vx', 'vy', 'target', 'isStatic', 'energy'];
         this.buffer = new ArrayBuffer(this.count * this.props.length * 4);
         this.floatBuffer = new Float32Array(this.buffer);
         this.intBuffer = new Int32Array(this.buffer);
@@ -40,12 +40,12 @@ Promiser.Engine = SC.Object.extend({
 
         for (i=0; i<this.count; i++) {
             var target = this.intBuffer[i*s+4];
-            var static = this.intBuffer[i*s+5];
+            var isStatic = this.intBuffer[i*s+5];
             var energy = this.intBuffer[i*s+6];
-            var targetStatic = this.intBuffer[target*s+5];
+            var targetIsStatic = this.intBuffer[target*s+5];
             var targetEnergy = this.intBuffer[target*s+6];
 
-            if (target === i || static) {
+            if (target === i || isStatic) {
                 continue;
             } 
 
@@ -77,11 +77,11 @@ Promiser.Engine = SC.Object.extend({
                     this.intBuffer[i*s+4] = this.getRandomTarget(i);
                     this.intBuffer[i*s+6] = energy - 1;
                     if (energy - 1 == 0) {
-                        static = 1;
-                        this.intBuffer[i*s+5] = static;
+                        isStatic = 1;
+                        this.intBuffer[i*s+5] = isStatic;
                     } 
                 }
-                if (targetStatic) {
+                if (targetIsStatic) {
                     // revive
                     if (false && Math.random() < 0.001) {
                         this.intBuffer[target*s+5] = 1;
@@ -103,7 +103,7 @@ Promiser.Engine = SC.Object.extend({
             var vx = this.floatBuffer[i*s+2];
             var vy = this.floatBuffer[i*s+3];
             var target = this.intBuffer[i*s+4];
-            var static = this.intBuffer[i*s+5];
+            var isStatic = this.intBuffer[i*s+5];
             var energy = this.intBuffer[i*s+6];
 
             x = x + vx;
@@ -121,7 +121,7 @@ Promiser.Engine = SC.Object.extend({
             //     y -= this.height;
             // }
 
-            if (!static) {
+            if (!isStatic) {
                 this.floatBuffer[i*s+0] = x + vx;
                 this.floatBuffer[i*s+1] = y + vy;    
             }
