@@ -6,11 +6,18 @@ Promiser.Engine = SC.Object.extend({
 
     fuel: function () {
         // initial setup
-        this.speed = 0.25;
+        this.speed = 3;
         this.speedSq = this.speed * this.speed;
-        this.width = 1000;
-        this.height = 1000;
+        // 1.9997 magic number for speed 3.
+        this.hitDistance = this.speed*1.9997;
+        this.hitDistanceSq = this.hitDistance * this.hitDistance;
+        this.width = 5000;
+        this.height = 5000;
         this.count = 10000;
+        this.ratio = 0.08;
+        this.maxEnergy = 5;
+        this.fps = 24;
+        this.msStep = Math.ceil(1000/this.fps);
         this.props = ['x', 'y', 'vx', 'vy', 'target', 'isStatic', 'energy'];
         this.buffer = new ArrayBuffer(this.count * this.props.length * 4);
         this.floatBuffer = new Float32Array(this.buffer);
@@ -24,14 +31,14 @@ Promiser.Engine = SC.Object.extend({
             this.floatBuffer[i*s+2] = 0;
             this.floatBuffer[i*s+3] = 0;
             this.intBuffer[i*s+4] = this.getRandomTarget(i);
-            this.intBuffer[i*s+5] = (Math.random() < 0.02 ? 1 : 0);
-            this.intBuffer[i*s+6] = 6;
+            this.intBuffer[i*s+5] = (Math.random() < this.ratio ? 1 : 0);
+            this.intBuffer[i*s+6] = this.maxEnergy;
         }
     },
 
     ignite: function () {
         console.log('Ignite');
-        this.worker = setInterval(this.update.bind(this), 1);
+        this.worker = setInterval(this.update.bind(this), this.msStep);
     },
 
     update: function () {
@@ -72,7 +79,17 @@ Promiser.Engine = SC.Object.extend({
 
             var dSq = dx*dx+dy*dy;
             
-            if (dSq < 1 * this.speedSq) {
+            if (dSq < this.hitDistanceSq) {
+
+                // weird logic from boom
+                if (Math.random() < 0.1) {
+                    this.intBuffer[target*s+5] = this.getRandomTarget(target);
+                    
+                    if (targetEnergy < this.maxEnergy) {
+                        this.intBuffer[target*s+5] = targetEnergy + 1;
+                    }
+                }
+
                 if (energy > 0) {
                     this.intBuffer[i*s+4] = this.getRandomTarget(i);
                     this.intBuffer[i*s+6] = energy - 1;
@@ -85,7 +102,7 @@ Promiser.Engine = SC.Object.extend({
                     // revive
                     if (false && Math.random() < 0.001) {
                         this.intBuffer[target*s+5] = 1;
-                        this.intBuffer[target*s+6] = 5;
+                        this.intBuffer[target*s+6] = this.maxEnergy;
                     }
                 }
             } else {

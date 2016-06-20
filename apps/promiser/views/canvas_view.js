@@ -14,13 +14,13 @@ Promiser.CanvasView = SC.View.extend({
         Promiser.camera = this.camera = Promiser.Camera.create({
             x: this.engine.width / 2,
             y: this.engine.height / 2,
-            zoom: 1
+            zoom: 0.5
         });
         this.ctx = this.canvas.getContext("2d");
         this.resizeCanvas();
         
         window.addEventListener('resize', this.resizeCanvas.bind(this), false);
-        this.worker = setInterval(this.triggerPaint.bind(this), 24);
+        this.worker = setInterval(this.triggerPaint.bind(this), this.engine.msStep);
     },
     
     didUpdateLayer: function () {
