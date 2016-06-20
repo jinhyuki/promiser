@@ -77,5 +77,37 @@ Promiser.CanvasView = SC.View.extend({
     resizeCanvas: function () {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+    },
+
+    mouseDown: function (evt) {
+        console.log('Mouse down');
+        // var rect = this.canvas.getBoundingClientRect();
+        this.mouseInfo = {
+            x: evt.clientX,
+            y: evt.clientY,
+            cx: this.camera.get('x'),
+            cy: this.camera.get('y')
+        };
+        return YES; // so we get other events
+    },
+
+    mouseDragged: function (evt) {
+        var info = this.mouseInfo;
+        var zoom = this.camera.get('zoom');
+        var dx = evt.clientX - info.x;
+        var dy = evt.clientY - info.y;
+        var x = info.cx - dx / zoom;
+        var y = info.cy - dy / zoom;
+        this.camera.set('x', x);
+        this.camera.set('y', y);
+    },
+
+    mouseUp: function (evt) {
+        console.log('Mouse up');
+        // apply one more time to set final position
+        this.mouseDragged(evt); 
+        this.mouseInfo = null; // cleanup info
+        return YES; // handled!
     }
+
 });
