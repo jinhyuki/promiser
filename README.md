@@ -2,4 +2,4 @@
 Promisers
 =========
 
-[Demo](https://jinhyuki.github.io/promiser/)
+[Demo](https://kndlt.github.io/promiser/)
